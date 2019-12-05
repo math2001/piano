@@ -4,6 +4,5 @@ go 1.13
 
 require (
 	github.com/faiface/beep v1.0.2
-	golang.org/x/tools v0.0.0-20191205002649-427c522ce2c7 // indirect
-	golang.org/x/tools/gopls v0.2.1 // indirect
+	golang.org/x/sys v0.0.0-20190412213103-97732733099d // indirect
 )
