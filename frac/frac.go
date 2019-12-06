@@ -1,4 +1,4 @@
-package main
+package frac
 
 import "fmt"
 
@@ -6,6 +6,10 @@ import "fmt"
 type Frac struct {
 	num int
 	den int
+}
+
+func NewFrac(num int, den int) Frac {
+    return Frac{num, den}
 }
 
 func (f Frac) String() string {

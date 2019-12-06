@@ -9,6 +9,7 @@ import (
 
 	"github.com/faiface/beep"
 	"github.com/faiface/beep/speaker"
+	"github.com/math2001/piano/labels"
 	"github.com/math2001/piano/wave"
 )
 
@@ -19,7 +20,7 @@ func main() {
 
 	T := time.Second / 440
 
-	labels := NewLabels()
+	lb := labels.NewLabels()
 
 	samples_per_period := sr.N(T)
 	sine := wave.NewSine(samples_per_period)
@@ -40,7 +41,7 @@ func main() {
 			ctrl.Paused = !ctrl.Paused
 			speaker.Unlock()
 		} else {
-			freq, err := labels.Frequency(line)
+			freq, err := lb.Frequency(line)
 			fmt.Println("frequency:", freq, "Hz")
 			if err != nil {
 				log.Fatalf("converting label %q to frequency: %s", line, err)

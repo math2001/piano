@@ -1,4 +1,4 @@
-package main
+package piece
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/faiface/beep"
+	"github.com/math2001/piano/frac"
 )
 
 // Note describes how a single note is played
@@ -22,13 +23,13 @@ type Note struct {
 	// ie. 1 is the duration one beat
 	//     2 is the duration two beats
 	//     .5 is the duration of half a beat
-	Duration Frac
+	Duration frac.Frac
 
 	// Start is the starting time, as a scaling of the beat
-	Start Frac
+	Start frac.Frac
 }
 
-func (n Note) End() Frac {
+func (n Note) End() frac.Frac {
 	return n.Start.Add(n.Duration)
 }
 
@@ -41,14 +42,14 @@ type Piece struct {
 }
 
 type block struct {
-	start    Frac
-	duration Frac
+	start    frac.Frac
+	duration frac.Frac
 	// this will be become streamers when I switch to samples instead of
 	// sine waves.
 	frequencies []float64
 }
 
-func (b *block) end() Frac {
+func (b *block) end() frac.Frac {
 	return b.start.Add(b.duration)
 }
 
@@ -59,99 +60,7 @@ func (b *block) equal(target block) bool {
 
 // Play assumes that the speaker has been initialized
 func (p *Piece) Play(sr beep.SampleRate, beat time.Duration) {
-}
 
-func (p *Piece) intersectionBlocks() []block {
-	// estimate the number of intersections
-	intersections := make([]block, 0, len(p.notes))
-	for _, a := range p.notes {
-		for _, b := range p.notes {
-			var splits []block
-			if a.End().Equal(b.End()) && b.Start.Equal(b.Start) {
-				splits = []block{
-					{
-						start:       a.Start,
-						duration:    a.Duration,
-						frequencies: []float64{a.Frequency, b.Frequency},
-					},
-				}
-			} else {
-				var hasOverlaps bool
-				splits, hasOverlaps = overlapsFrom(a, b)
-				if !hasOverlaps {
-					// they don't overlap. Since we assume that the notes are
-					// sorted, we can conclude all the remaining notes won't
-					// intersect
-					break
-				}
-			}
-			intersections = append(intersections, splits...)
-
-		}
-	}
-	return intersections
-}
-
-// returns the splits from two notes
-// Case 1:
-// |  A |  B  | C      |
-// ***********
-//       ***************
-// Case 2:
-// |A |   B  | C  |
-// ***************
-//     ******
-// hence, it always returns 3 splits
-func overlapsFrom(a Note, b Note) (splits []block, doOverlap bool) {
-	if a.Start.Float() > b.Start.Float() {
-		panic(fmt.Sprintf("wrong order: a.start has to be less than b.start (shouldn't happen, notes are supposed to be sorted) %v %v", a, b))
-	}
-
-	if a.Start == b.Start && a.End() == b.End() {
-		panic("a and b are equivalent. This is a simple edge case, handle it yourself")
-	}
-
-	doOverlap = a.End().Float() > b.Start.Float() && a.End().Float() < b.End().Float()
-
-	isFirstCase := a.End().Float() < b.End().Float()
-
-	if !doOverlap {
-		return splits, false
-	}
-
-	splits = make([]block, 3)
-
-	splits[0] = block{
-		start:       a.Start,
-		duration:    b.Start.Minus(a.Start),
-		frequencies: []float64{a.Frequency},
-	}
-
-	duration := b.Duration
-	if isFirstCase {
-		duration = a.End().Minus(b.Start)
-	}
-
-	splits[1] = block{
-		start:       b.Start,
-		duration:    duration,
-		frequencies: []float64{a.Frequency, b.Frequency},
-	}
-
-	freq := a.Frequency
-	start := b.End()
-	if isFirstCase {
-		freq = b.Frequency
-		start = a.End()
-	}
-
-	splits[2] = block{
-		start:       start,
-		duration:    b.End().Minus(a.End()).Abs(),
-		frequencies: []float64{freq},
-	}
-
-	return splits, true
 }
 
 func (p *Piece) Render() {
@@ -176,7 +85,7 @@ func (p *Piece) Render() {
 		}
 	}
 
-	k := Frac{scaler, 1}
+	k := frac.NewFrac(scaler, 1)
 
 	for freq, notes := range frequencies {
 		fmt.Printf("%3.0f: ", freq)
