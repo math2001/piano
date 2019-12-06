@@ -28,6 +28,10 @@ type Note struct {
 	Start Frac
 }
 
+func (n Note) End() Frac {
+	return n.Start.Add(n.Duration)
+}
+
 // Piece is a collection of notes
 type Piece struct {
 	name string
@@ -37,18 +41,117 @@ type Piece struct {
 }
 
 type block struct {
-	start     float64
-	duration  float64
-	streamers []beep.Streamer
+	start    Frac
+	duration Frac
+	// this will be become streamers when I switch to samples instead of
+	// sine waves.
+	frequencies []float64
 }
 
-func (b *block) end() float64 {
-	return b.start + b.duration
+func (b *block) end() Frac {
+	return b.start.Add(b.duration)
+}
+
+func (b *block) equal(target block) bool {
+	// FIXME: better comparaisson of streamers please
+	return b.start.Equal(target.start) && b.duration.Equal(target.duration) && len(b.frequencies) == len(target.frequencies)
 }
 
 // Play assumes that the speaker has been initialized
 func (p *Piece) Play(sr beep.SampleRate, beat time.Duration) {
-	// intersections := make([]block, len(p.notes))
+}
+
+func (p *Piece) intersectionBlocks() []block {
+	// estimate the number of intersections
+	intersections := make([]block, 0, len(p.notes))
+	for _, a := range p.notes {
+		for _, b := range p.notes {
+			var splits []block
+			if a.End().Equal(b.End()) && b.Start.Equal(b.Start) {
+				splits = []block{
+					{
+						start:       a.Start,
+						duration:    a.Duration,
+						frequencies: []float64{a.Frequency, b.Frequency},
+					},
+				}
+			} else {
+				var hasOverlaps bool
+				splits, hasOverlaps = overlapsFrom(a, b)
+				if !hasOverlaps {
+					// they don't overlap. Since we assume that the notes are
+					// sorted, we can conclude all the remaining notes won't
+					// intersect
+					break
+				}
+			}
+			intersections = append(intersections, splits...)
+
+		}
+	}
+	return intersections
+}
+
+// returns the splits from two notes
+// Case 1:
+// |  A |  B  | C      |
+// ***********
+//       ***************
+// Case 2:
+// |A |   B  | C  |
+// ***************
+//     ******
+// hence, it always returns 3 splits
+func overlapsFrom(a Note, b Note) (splits []block, doOverlap bool) {
+	if a.Start.Float() > b.Start.Float() {
+		panic(fmt.Sprintf("wrong order: a.start has to be less than b.start (shouldn't happen, notes are supposed to be sorted) %v %v", a, b))
+	}
+
+	if a.Start == b.Start && a.End() == b.End() {
+		panic("a and b are equivalent. This is a simple edge case, handle it yourself")
+	}
+
+	doOverlap = a.End().Float() > b.Start.Float() && a.End().Float() < b.End().Float()
+
+	isFirstCase := a.End().Float() < b.End().Float()
+
+	if !doOverlap {
+		return splits, false
+	}
+
+	splits = make([]block, 3)
+
+	splits[0] = block{
+		start:       a.Start,
+		duration:    b.Start.Minus(a.Start),
+		frequencies: []float64{a.Frequency},
+	}
+
+	duration := b.Duration
+	if isFirstCase {
+		duration = a.End().Minus(b.Start)
+	}
+
+	splits[1] = block{
+		start:       b.Start,
+		duration:    duration,
+		frequencies: []float64{a.Frequency, b.Frequency},
+	}
+
+	freq := a.Frequency
+	start := b.End()
+	if isFirstCase {
+		freq = b.Frequency
+		start = a.End()
+	}
+
+	splits[2] = block{
+		start:       start,
+		duration:    b.End().Minus(a.End()).Abs(),
+		frequencies: []float64{freq},
+	}
+
+	return splits, true
 }
 
 func (p *Piece) Render() {
@@ -60,7 +163,7 @@ func (p *Piece) Render() {
 	frequencies := make(map[float64][]Note)
 	for _, note := range p.notes {
 		frequencies[note.Frequency] = append(frequencies[note.Frequency], note)
-		dens = append(dens, note.Duration.Den, note.Start.Den)
+		dens = append(dens, note.Duration.Den(), note.Start.Den())
 	}
 
 	// compute the smallest number which is a product of all the different
@@ -80,10 +183,10 @@ func (p *Piece) Render() {
 		// we assume the notes are sorted
 		pos := 0
 		for _, note := range notes {
-			start := note.Start.Multiply(k).Num
-			width := note.Duration.Multiply(k).Num
+			start := note.Start.Multiply(k).Num()
+			width := note.Duration.Multiply(k).Num()
 			if pos > start {
-				panic(fmt.Sprintf("current position %d is later than required start position of %v", pos, note))
+				panic(fmt.Sprintf("current position %d is later than required start position of %v: %d", pos, note, start))
 			}
 			fmt.Print(strings.Repeat(" ", start-pos))
 			fmt.Print(strings.Repeat("*", width))

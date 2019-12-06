@@ -2,21 +2,68 @@ package main
 
 import "fmt"
 
+// Frac is an immutable number
 type Frac struct {
-	Num int
-	Den int
+	num int
+	den int
 }
 
 func (f Frac) String() string {
-	return fmt.Sprintf("%d/%d", f.Num, f.Den)
+	return fmt.Sprintf("%d/%d", f.Num(), f.Den())
 }
 
-func (f Frac) Multiply(target Frac) Frac {
-	num := target.Num * f.Num
-	den := target.Den * f.Den
+func (f Frac) Float() float64 {
+	return float64(f.num) / float64(f.den)
+}
 
-	k := gcd(num, den)
-	return Frac{num / k, den / k}
+func (f Frac) Simplify() Frac {
+	// what happens with negative numbers?
+	k := gcd(f.Num(), f.Den())
+	return Frac{f.Num() / k, f.Den() / k}
+}
+
+func (f Frac) Abs() Frac {
+	num := f.num
+	den := f.den
+	if num < 0 {
+		num *= -1
+	}
+	if den < 0 {
+		den *= -1
+	}
+	return Frac{num, den}
+}
+
+func (f Frac) Num() int {
+	return f.num
+}
+
+func (f Frac) Den() int {
+	return f.den
+}
+
+func (a Frac) Multiply(b Frac) Frac {
+	return Frac{
+		num: a.Num() * b.Num(),
+		den: a.Den() * b.Den(),
+	}.Simplify()
+}
+
+func (a Frac) Add(b Frac) Frac {
+	return Frac{
+		num: a.Num()*b.Den() + b.Num()*a.Den(),
+		den: a.Den() * b.Den(),
+	}
+}
+
+func (a Frac) Minus(b Frac) Frac {
+	return a.Add(b.Multiply(Frac{-1, 1}))
+}
+
+func (a Frac) Equal(b Frac) bool {
+	a = a.Simplify()
+	b = b.Simplify()
+	return a.Num() == b.Num() && a.Den() == b.Den()
 }
 
 func gcd(a, b int) int {
