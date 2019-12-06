@@ -64,3 +64,9 @@ Cons:
     C5: **********
 
     Here there would be one mix per star.
+
+##### Markers
+
+Mark each start/end of note as a marker. And then just move from marker to
+marker (assume they are sorted), and mix what is between the current marker and
+the previous marker

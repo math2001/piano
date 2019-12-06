@@ -41,6 +41,8 @@ type Piece struct {
 	notes []Note
 }
 
+// a block is like a note but can have multiple streamer (which we mix).
+// the streamers are all mixed from start during duration.
 type block struct {
 	start    frac.Frac
 	duration frac.Frac
@@ -60,7 +62,65 @@ func (b *block) equal(target block) bool {
 
 // Play assumes that the speaker has been initialized
 func (p *Piece) Play(sr beep.SampleRate, beat time.Duration) {
+	// how the algorithm works
+	// get every marker
+	// (a marker is the start or the end of a note. It's just a number)
+	//
+	// for each marker
+	//     find every note that intersect (start <= prev_marker && end >= current_marker)
+	//     mix all those notes together from prev_marker to current_marker
 
+}
+
+func (p *Piece) intersectionBlocks() []block {
+
+	markers := p.getMarkers()
+
+	var blocks []block
+
+	for i, currentMarker := range markers {
+		if i == 0 {
+			continue
+		}
+		prevMarker := markers[i-1]
+		currentblock := block{
+			start:    prevMarker,
+			duration: currentMarker.Minus(prevMarker),
+		}
+		// FIXME: we can limit what how many notes are looping over here...
+		for _, note := range p.notes {
+			intersect := note.Start.Float() <= prevMarker.Float()
+			intersect = intersect && note.End().Float() >= currentMarker.Float()
+			if intersect {
+				currentblock.frequencies = append(currentblock.frequencies, note.Frequency)
+			}
+		}
+		blocks = append(blocks, currentblock)
+	}
+	return blocks
+}
+
+// markers are where the notes start or finish
+func (p *Piece) getMarkers() []frac.Frac {
+	var markers []frac.Frac
+	for _, note := range p.notes {
+		markers = append(markers, note.Start, note.End())
+	}
+
+	sort.SliceStable(markers, func(i, j int) bool {
+		return markers[i].Float() < markers[j].Float()
+	})
+	fmt.Println(markers)
+
+	// remove duplicates
+	j := 1
+	for i := 1; i < len(markers); i++ {
+		if markers[i] != markers[i-1] {
+			markers[j] = markers[i]
+			j++
+		}
+	}
+	return markers[:j]
 }
 
 func (p *Piece) Render() {
@@ -85,7 +145,7 @@ func (p *Piece) Render() {
 		}
 	}
 
-	k := frac.NewFrac(scaler, 1)
+	k := frac.F(scaler, 1)
 
 	for freq, notes := range frequencies {
 		fmt.Printf("%3.0f: ", freq)

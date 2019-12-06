@@ -8,8 +8,8 @@ type Frac struct {
 	den int
 }
 
-func NewFrac(num int, den int) Frac {
-    return Frac{num, den}
+func F(num int, den int) Frac {
+	return Frac{num, den}
 }
 
 func (f Frac) String() string {
@@ -57,13 +57,15 @@ func (a Frac) Add(b Frac) Frac {
 	return Frac{
 		num: a.Num()*b.Den() + b.Num()*a.Den(),
 		den: a.Den() * b.Den(),
-	}
+	}.Simplify()
 }
 
 func (a Frac) Minus(b Frac) Frac {
 	return a.Add(b.Multiply(Frac{-1, 1}))
 }
 
+// I just realised that we don't need this function... == works on struct with
+// comparable fields
 func (a Frac) Equal(b Frac) bool {
 	a = a.Simplify()
 	b = b.Simplify()
