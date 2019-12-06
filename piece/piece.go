@@ -8,6 +8,7 @@ import (
 
 	"github.com/faiface/beep"
 	"github.com/math2001/piano/frac"
+	"github.com/math2001/piano/wave"
 )
 
 // Note describes how a single note is played
@@ -38,12 +39,13 @@ type Piece struct {
 	name string
 	// float64 is a scalar describing the start time of each note relative to
 	// the start of the piece (it scales one beat)
-	notes []Note
+	Notes []Note
 }
 
 // a block is like a note but can have multiple streamer (which we mix).
 // the streamers are all mixed from start during duration.
 type block struct {
+	// we don't need to know about start
 	start    frac.Frac
 	duration frac.Frac
 	// this will be become streamers when I switch to samples instead of
@@ -61,7 +63,7 @@ func (b *block) equal(target block) bool {
 }
 
 // Play assumes that the speaker has been initialized
-func (p *Piece) Play(sr beep.SampleRate, beat time.Duration) {
+func (p *Piece) GetStreamer(sr beep.SampleRate, beat time.Duration) beep.Streamer {
 	// how the algorithm works
 	// get every marker
 	// (a marker is the start or the end of a note. It's just a number)
@@ -70,6 +72,36 @@ func (p *Piece) Play(sr beep.SampleRate, beat time.Duration) {
 	//     find every note that intersect (start <= prev_marker && end >= current_marker)
 	//     mix all those notes together from prev_marker to current_marker
 
+	blocks := p.intersectionBlocks()
+
+	// a simple slice that we give to a sequencer (ie if no sound is going to
+	// be played, we need to pass in silence, because otherwise the next block
+	// will play straight away)
+
+	var streamers []beep.Streamer
+	for _, block := range blocks {
+		nsamples := sr.N(beat * time.Duration(block.duration.Float()))
+
+		var streamer beep.Streamer
+		if len(block.frequencies) == 0 {
+			streamer = beep.Silence(-1)
+		} else if len(block.frequencies) == 1 {
+			// FIXME: please do some caching. At least profile to check the
+			// cost
+			streamer = beep.Loop(-1, wave.NewSine(wave.N(sr, block.frequencies[0])))
+		} else {
+			mixer := &beep.Mixer{}
+			for _, freq := range block.frequencies {
+				mixer.Add(beep.Loop(-1, wave.NewSine(wave.N(sr, freq))))
+			}
+			streamer = mixer
+		}
+		streamers = append(streamers, beep.Take(nsamples, streamer))
+	}
+
+	fmt.Println(streamers)
+
+	return beep.Seq(streamers...)
 }
 
 func (p *Piece) intersectionBlocks() []block {
@@ -88,7 +120,7 @@ func (p *Piece) intersectionBlocks() []block {
 			duration: currentMarker.Minus(prevMarker),
 		}
 		// FIXME: we can limit what how many notes are looping over here...
-		for _, note := range p.notes {
+		for _, note := range p.Notes {
 			intersect := note.Start.Float() <= prevMarker.Float()
 			intersect = intersect && note.End().Float() >= currentMarker.Float()
 			if intersect {
@@ -103,7 +135,7 @@ func (p *Piece) intersectionBlocks() []block {
 // markers are where the notes start or finish
 func (p *Piece) getMarkers() []frac.Frac {
 	var markers []frac.Frac
-	for _, note := range p.notes {
+	for _, note := range p.Notes {
 		markers = append(markers, note.Start, note.End())
 	}
 
@@ -130,7 +162,7 @@ func (p *Piece) Render() {
 	var dens []int
 
 	frequencies := make(map[float64][]Note)
-	for _, note := range p.notes {
+	for _, note := range p.Notes {
 		frequencies[note.Frequency] = append(frequencies[note.Frequency], note)
 		dens = append(dens, note.Duration.Den(), note.Start.Den())
 	}

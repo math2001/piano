@@ -8,6 +8,8 @@ import (
 	"unicode"
 )
 
+// this should just generate some go code defining constants
+
 var ErrParsingName = errors.New("parsing name")
 var tones = map[string]int{
 	"C":  0,
@@ -99,6 +101,16 @@ func (n *Labels) Frequency(name string) (freq float64, err error) {
 		return 0, err
 	}
 	return n.FromIndex(index), nil
+}
+
+// F is the same as Frequency, except it panics if there is an error. Don't
+// pass in user data, just static strings
+func (n *Labels) F(name string) float64 {
+	index, err := n.name(name)
+	if err != nil {
+		panic(fmt.Sprintf("%s (if you don't want panic, use .Frequency instead)", err))
+	}
+	return n.FromIndex(index)
 }
 
 // todo

@@ -9,21 +9,63 @@ import (
 
 	"github.com/faiface/beep"
 	"github.com/faiface/beep/speaker"
+	"github.com/math2001/piano/frac"
 	"github.com/math2001/piano/labels"
+	"github.com/math2001/piano/piece"
 	"github.com/math2001/piano/wave"
 )
 
 func main() {
-	return
+	lb := labels.NewLabels()
+	p := &piece.Piece{
+		Notes: []piece.Note{
+			piece.Note{
+				Frequency: lb.F("A4"),
+				Duration:  frac.F(1, 1),
+				Start:     frac.F(0, 1),
+			},
+			piece.Note{
+				Frequency: lb.F("C5"),
+				Duration:  frac.F(1, 1),
+				Start:     frac.F(1, 1),
+			},
+			piece.Note{
+				Frequency: lb.F("A4"),
+				Duration:  frac.F(1, 1),
+				Start:     frac.F(2, 1),
+			},
+			piece.Note{
+				Frequency: lb.F("F4"),
+				Duration:  frac.F(1, 1),
+				Start:     frac.F(3, 1),
+			},
+			piece.Note{
+				Frequency: lb.F("A4"),
+				Duration:  frac.F(3, 1),
+				Start:     frac.F(4, 1),
+			},
+		},
+	}
+
 	sr := beep.SampleRate(44100)
 	speaker.Init(sr, sr.N(time.Second/6))
 
-	T := time.Second / 440
+	streamer := p.GetStreamer(sr, piece.FromBPM(60))
+
+	done := make(chan bool)
+	speaker.Play(beep.Seq(streamer, beep.Callback(func() {
+		done <- true
+	})))
+	<-done
+}
+
+func notePlayer() {
+	sr := beep.SampleRate(44100)
+	speaker.Init(sr, sr.N(time.Second/6))
 
 	lb := labels.NewLabels()
 
-	samples_per_period := sr.N(T)
-	sine := wave.NewSine(samples_per_period)
+	sine := wave.NewSine(wave.N(sr, 440))
 	loop := beep.Loop(-1, sine)
 	ctrl := &beep.Ctrl{Streamer: loop, Paused: false}
 

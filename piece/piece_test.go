@@ -9,7 +9,7 @@ import (
 
 func TestPiecePlaySimultaneous(t *testing.T) {
 	p := &Piece{
-		notes: []Note{
+		Notes: []Note{
 			Note{
 				Frequency: 440,
 				Duration:  frac.F(2, 1),
@@ -40,7 +40,7 @@ func TestPiecePlaySimultaneous(t *testing.T) {
 
 func TestPiecePlayContainingOverlap(t *testing.T) {
 	p := &Piece{
-		notes: []Note{
+		Notes: []Note{
 			Note{
 				Frequency: 440,
 				Duration:  frac.F(3, 1),
@@ -71,7 +71,7 @@ func TestPiecePlayContainingOverlap(t *testing.T) {
 
 func TestPiecePlayIntersectingOverlap(t *testing.T) {
 	p := &Piece{
-		notes: []Note{
+		Notes: []Note{
 			Note{
 				Frequency: 440,
 				Duration:  frac.F(3, 1),
@@ -102,7 +102,7 @@ func TestPiecePlayIntersectingOverlap(t *testing.T) {
 
 func TestGetMarkersSimple(t *testing.T) {
 	p := &Piece{
-		notes: []Note{
+		Notes: []Note{
 			Note{
 				Frequency: 440,
 				Duration:  frac.F(3, 1),
@@ -131,7 +131,7 @@ func TestGetMarkersSimple(t *testing.T) {
 
 func TestGetMarkersDuplicates(t *testing.T) {
 	p := &Piece{
-		notes: []Note{
+		Notes: []Note{
 			Note{
 				Frequency: 440,
 				Duration:  frac.F(3, 1),
