@@ -13,6 +13,7 @@ import (
 )
 
 func main() {
+	return
 	sr := beep.SampleRate(44100)
 	speaker.Init(sr, sr.N(time.Second/6))
 
@@ -21,7 +22,6 @@ func main() {
 	labels := NewLabels()
 
 	samples_per_period := sr.N(T)
-	fmt.Println(samples_per_period)
 	sine := wave.NewSine(samples_per_period)
 	loop := beep.Loop(-1, sine)
 	ctrl := &beep.Ctrl{Streamer: loop, Paused: false}
@@ -41,6 +41,7 @@ func main() {
 			speaker.Unlock()
 		} else {
 			freq, err := labels.Frequency(line)
+			fmt.Println("frequency:", freq, "Hz")
 			if err != nil {
 				log.Fatalf("converting label %q to frequency: %s", line, err)
 			}

@@ -100,3 +100,8 @@ func (n *Labels) Frequency(name string) (freq float64, err error) {
 	}
 	return n.FromIndex(index), nil
 }
+
+// todo
+// func (n *labels) Label(freq float64) (string, error) {
+
+// }
