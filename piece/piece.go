@@ -164,3 +164,8 @@ func (p *Piece) Render() {
 		fmt.Println()
 	}
 }
+
+// FromBPM returns the duration of the one beat for a given bpm (beat per minute)
+func FromBPM(bpm int) time.Duration {
+	return time.Duration(60 * 1E9 / bpm)
+}

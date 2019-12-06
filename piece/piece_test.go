@@ -2,6 +2,7 @@ package piece
 
 import (
 	"testing"
+	"time"
 
 	"github.com/math2001/piano/frac"
 )
@@ -161,5 +162,23 @@ func TestGetMarkersDuplicates(t *testing.T) {
 
 	if len(actual) != len(expected) {
 		t.Fatalf("markers length don't match: \n(%d) %v\n(%d) %v", len(actual), actual, len(expected), expected)
+	}
+}
+
+func TestFromBPM(t *testing.T) {
+	var bpmDuration = []struct {
+		bpm      int
+		duration time.Duration
+	}{
+		{120, 500 * time.Millisecond},
+		{60, time.Second},
+		{100, 600 * time.Millisecond},
+	}
+
+	for _, row := range bpmDuration {
+		actual := FromBPM(row.bpm)
+		if actual != row.duration {
+			t.Errorf("bpm: %d, actual: %v, expected: %v", row.bpm, actual, row.duration)
+		}
 	}
 }
