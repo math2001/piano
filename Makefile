@@ -1,7 +1,7 @@
 .PHONY: run test
 
 test: *.go wave/*.go
-	go test . ./piece ./frac ./labels ./wave
+	go test ./...
 
 run: piano
 	./piano
