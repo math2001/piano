@@ -6,7 +6,7 @@ test: *.go wave/*.go
 run: piano
 	./piano
 
-piano: *.go wave/*.go
+piano: $(shell fd --type f --extension go)
 	go build
 
 
