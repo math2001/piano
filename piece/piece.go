@@ -148,7 +148,7 @@ func (p *Piece) getMarkers() []frac.Frac {
 	// silence... (this is due to the fact that intersectionBlocks just bases
 	// itself on markers exclusively, and hence goes straight to the first marker
 	// all the time)
-	markers[0] = frac.F(0, 1)
+	markers[0] = frac.N(0)
 
 	for i, note := range p.Notes {
 		markers[i*2+1] = note.Start

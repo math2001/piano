@@ -12,13 +12,13 @@ func TestIntersectionSimultaneous(t *testing.T) {
 		Notes: []Note{
 			Note{
 				Frequency: 440,
-				Duration:  frac.F(2, 1),
-				Start:     frac.F(0, 1),
+				Duration:  frac.N(2),
+				Start:     frac.N(0),
 			},
 			Note{
 				Frequency: 523.25,
-				Duration:  frac.F(2, 1),
-				Start:     frac.F(0, 1),
+				Duration:  frac.N(2),
+				Start:     frac.N(0),
 			},
 		},
 	}
@@ -26,7 +26,7 @@ func TestIntersectionSimultaneous(t *testing.T) {
 	blocks := p.intersectionBlocks()
 	expected := []block{
 		// two streamers, don't really know how it's gonna be implemented
-		{start: frac.F(0, 1), duration: frac.F(2, 1), frequencies: []float64{0, 0}},
+		{start: frac.N(0), duration: frac.N(2), frequencies: []float64{0, 0}},
 	}
 	if len(blocks) != len(expected) {
 		t.Fatalf("intersection blocks length don't match: \n%v\n%v", blocks, expected)
@@ -43,21 +43,21 @@ func TestIntersectionContainingOverlap(t *testing.T) {
 		Notes: []Note{
 			Note{
 				Frequency: 440,
-				Duration:  frac.F(3, 1),
-				Start:     frac.F(0, 1),
+				Duration:  frac.N(3),
+				Start:     frac.N(0),
 			},
 			Note{
 				Frequency: 523.25,
-				Duration:  frac.F(1, 1),
-				Start:     frac.F(1, 1),
+				Duration:  frac.N(1),
+				Start:     frac.N(1),
 			},
 		},
 	}
 	blocks := p.intersectionBlocks()
 	expected := []block{
-		{start: frac.F(0, 1), duration: frac.F(1, 1), frequencies: []float64{0}},
-		{start: frac.F(1, 1), duration: frac.F(1, 1), frequencies: []float64{0, 0}},
-		{start: frac.F(2, 1), duration: frac.F(1, 1), frequencies: []float64{0}},
+		{start: frac.N(0), duration: frac.N(1), frequencies: []float64{0}},
+		{start: frac.N(1), duration: frac.N(1), frequencies: []float64{0, 0}},
+		{start: frac.N(2), duration: frac.N(1), frequencies: []float64{0}},
 	}
 	if len(blocks) != len(expected) {
 		t.Fatalf("intersection blocks length don't match: \n%v\n%v", blocks, expected)
@@ -74,22 +74,22 @@ func TestIntersectionSilence(t *testing.T) {
 		Notes: []Note{
 			Note{
 				Frequency: 440,
-				Duration:  frac.F(1, 1),
-				Start:     frac.F(2, 1),
+				Duration:  frac.N(1),
+				Start:     frac.N(2),
 			},
 			Note{
 				Frequency: 523.25,
-				Duration:  frac.F(3, 1),
-				Start:     frac.F(4, 1),
+				Duration:  frac.N(3),
+				Start:     frac.N(4),
 			},
 		},
 	}
 	blocks := p.intersectionBlocks()
 	expected := []block{
-		{start: frac.F(0, 1), duration: frac.F(2, 1), frequencies: []float64{}},
-		{start: frac.F(2, 1), duration: frac.F(1, 1), frequencies: []float64{0}},
-		{start: frac.F(3, 1), duration: frac.F(1, 1), frequencies: []float64{}},
-		{start: frac.F(4, 1), duration: frac.F(3, 1), frequencies: []float64{0}},
+		{start: frac.N(0), duration: frac.N(2), frequencies: []float64{}},
+		{start: frac.N(2), duration: frac.N(1), frequencies: []float64{0}},
+		{start: frac.N(3), duration: frac.N(1), frequencies: []float64{}},
+		{start: frac.N(4), duration: frac.N(3), frequencies: []float64{0}},
 	}
 	if len(blocks) != len(expected) {
 		t.Fatalf("intersection blocks length don't match: \n%v\n%v", blocks, expected)
@@ -105,21 +105,21 @@ func TestIntersectionOverlap(t *testing.T) {
 		Notes: []Note{
 			Note{
 				Frequency: 440,
-				Duration:  frac.F(3, 1),
-				Start:     frac.F(0, 1),
+				Duration:  frac.N(3),
+				Start:     frac.N(0),
 			},
 			Note{
 				Frequency: 523.25,
-				Duration:  frac.F(3, 1),
-				Start:     frac.F(1, 1),
+				Duration:  frac.N(3),
+				Start:     frac.N(1),
 			},
 		},
 	}
 	blocks := p.intersectionBlocks()
 	expected := []block{
-		{start: frac.F(0, 1), duration: frac.F(1, 1), frequencies: []float64{0}},
-		{start: frac.F(1, 1), duration: frac.F(2, 1), frequencies: []float64{0, 0}},
-		{start: frac.F(3, 1), duration: frac.F(1, 1), frequencies: []float64{0}},
+		{start: frac.N(0), duration: frac.N(1), frequencies: []float64{0}},
+		{start: frac.N(1), duration: frac.N(2), frequencies: []float64{0, 0}},
+		{start: frac.N(3), duration: frac.N(1), frequencies: []float64{0}},
 	}
 	if len(blocks) != len(expected) {
 		t.Fatalf("intersection blocks length don't match: \n%v\n%v", blocks, expected)
@@ -136,23 +136,23 @@ func TestGetMarkersSimple(t *testing.T) {
 		Notes: []Note{
 			Note{
 				Frequency: 440,
-				Duration:  frac.F(3, 1),
-				Start:     frac.F(0, 1),
+				Duration:  frac.N(3),
+				Start:     frac.N(0),
 			},
 			Note{
 				Frequency: 523.25,
-				Duration:  frac.F(3, 1),
-				Start:     frac.F(1, 1),
+				Duration:  frac.N(3),
+				Start:     frac.N(1),
 			},
 		},
 	}
 
 	actual := p.getMarkers()
 	expected := []frac.Frac{
-		frac.F(0, 1),
-		frac.F(1, 1),
-		frac.F(3, 1),
-		frac.F(4, 1),
+		frac.N(0),
+		frac.N(1),
+		frac.N(3),
+		frac.N(4),
 	}
 
 	if len(actual) != len(expected) {
@@ -165,30 +165,30 @@ func TestGetMarkersDuplicates(t *testing.T) {
 		Notes: []Note{
 			Note{
 				Frequency: 440,
-				Duration:  frac.F(3, 1),
-				Start:     frac.F(0, 1),
+				Duration:  frac.N(3),
+				Start:     frac.N(0),
 			},
 			Note{
 				Frequency: 523.25,
-				Duration:  frac.F(3, 1),
-				Start:     frac.F(1, 1),
+				Duration:  frac.N(3),
+				Start:     frac.N(1),
 			},
 			Note{
 				Frequency: 523.25,
-				Duration:  frac.F(3, 1),
-				Start:     frac.F(2, 1),
+				Duration:  frac.N(3),
+				Start:     frac.N(2),
 			},
 		},
 	}
 
 	actual := p.getMarkers()
 	expected := []frac.Frac{
-		frac.F(0, 1),
-		frac.F(1, 1),
-		frac.F(2, 1),
-		frac.F(3, 1),
-		frac.F(4, 1),
-		frac.F(5, 1),
+		frac.N(0),
+		frac.N(1),
+		frac.N(2),
+		frac.N(3),
+		frac.N(4),
+		frac.N(5),
 	}
 
 	if len(actual) != len(expected) {
