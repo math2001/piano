@@ -95,9 +95,6 @@ func (p *Piece) GetStreamer(sr beep.SampleRate, beat time.Duration) beep.Streame
 			for _, freq := range block.frequencies {
 				mixer.Add(beep.Loop(-1, wave.NewSine(wave.N(sr, freq))))
 			}
-			if mixer.Len() != len(block.frequencies) {
-				panic("wtf")
-			}
 			// mixer only sums up the samples. That means if we sum up to 1s,
 			// we get a two which isn't allowed. Instead, we want to take the
 			// *average* of the different streamers. This is what gain does

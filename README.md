@@ -13,4 +13,4 @@ lot of room, as said in the wiki. I should probably use a `beep.Buffer` using a
 ### Use a polynomial approximation instead of `math.Sin`
 
 (Measure the performance gain before doing that)
-Then, I could vary the precision and optimise it for the length of our wave
+Then, I could vary the precision and optimise it for the period of the wave
