@@ -184,7 +184,6 @@ func (p *Piece) getMarkers() []frac.Frac {
 func (p *Piece) Render() {
 	// we make duration and start integers (fraction with denominator 1)
 	// so that every character is the lower fraction of time in the piece
-
 	var dens []int
 
 	frequencies := make(map[float64][]Note)
@@ -205,19 +204,39 @@ func (p *Piece) Render() {
 
 	k := frac.F(scaler, 1)
 
+	type block struct{ start, width int }
+	overlaps := make(map[float64][]block)
+
 	for freq, notes := range frequencies {
 		fmt.Printf("%3.0f: ", freq)
 		// we assume the notes are sorted
-		pos := 0
+		cursor := 0
 		for _, note := range notes {
 			start := note.Start.Multiply(k).Num()
 			width := note.Duration.Multiply(k).Num()
-			if pos > start {
-				panic(fmt.Sprintf("current position %d is later than required start position of %v: %d", pos, note, start))
+			if cursor > start {
+				overlaps[freq] = append(overlaps[freq], block{start, cursor - start})
+				if cursor > start+width {
+					continue
+				}
+				width -= cursor - start
+				start = cursor
 			}
-			fmt.Print(strings.Repeat(" ", start-pos))
+			fmt.Print(strings.Repeat(" ", start-cursor))
 			fmt.Print(strings.Repeat("*", width))
-			pos = start + width
+			cursor = start + width
+		}
+		fmt.Println()
+	}
+	// maybe this could instead display funny characters when things overlap...
+	// too lazy to do that right now...
+	if len(overlaps) > 0 {
+		fmt.Println("overlaps:")
+		for freq, blocks := range overlaps {
+			fmt.Printf("%3.0f: | ", freq)
+			for _, block := range blocks {
+				fmt.Printf("at %d width %d | ", block.start, block.width)
+			}
 		}
 		fmt.Println()
 	}

@@ -9,6 +9,8 @@ import (
 
 func TestIntersectionSimultaneous(t *testing.T) {
 	p := &Piece{
+		// 440: **
+		// 523: **
 		Notes: []Note{
 			Note{
 				Frequency: 440,
@@ -59,6 +61,8 @@ func TestIntersectionContainingOverlap(t *testing.T) {
 
 func TestIntersectionSilence(t *testing.T) {
 	p := &Piece{
+		// 440:   *
+		// 523:     ***
 		Notes: []Note{
 			Note{
 				Frequency: 440,
@@ -109,6 +113,8 @@ func TestIntersectionOverlap(t *testing.T) {
 
 func TestGetMarkersSimple(t *testing.T) {
 	p := &Piece{
+		// 440: ***
+		// 523:  ***
 		Notes: []Note{
 			Note{
 				Frequency: 440,
@@ -144,6 +150,9 @@ func TestGetMarkersSimple(t *testing.T) {
 func TestGetMarkersDuplicates(t *testing.T) {
 	p := &Piece{
 		Notes: []Note{
+			// 349:   ***
+			// 440: ***
+			// 523:  ***
 			Note{
 				Frequency: 440,
 				Duration:  frac.N(3),
@@ -155,7 +164,7 @@ func TestGetMarkersDuplicates(t *testing.T) {
 				Start:     frac.N(1),
 			},
 			Note{
-				Frequency: 523.25,
+				Frequency: 349.23,
 				Duration:  frac.N(3),
 				Start:     frac.N(2),
 			},

@@ -57,6 +57,22 @@ func main() {
 			},
 		},
 	}
+	p = &piece.Piece{
+		Notes: []piece.Note{
+			piece.Note{
+				Frequency: 440,
+				Duration:  frac.N(2),
+				Start:     frac.N(0),
+			},
+			piece.Note{
+				Frequency: 440,
+				Duration:  frac.N(2),
+				Start:     frac.N(1),
+			},
+		},
+	}
+	p.Render()
+	return
 
 	sr := beep.SampleRate(44100)
 	speaker.Init(sr, sr.N(time.Second/6))
