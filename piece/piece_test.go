@@ -74,8 +74,8 @@ func TestPiecePlaySilence(t *testing.T) {
 		Notes: []Note{
 			Note{
 				Frequency: 440,
-				Duration:  frac.F(3, 1),
-				Start:     frac.F(0, 1),
+				Duration:  frac.F(1, 1),
+				Start:     frac.F(2, 1),
 			},
 			Note{
 				Frequency: 523.25,
@@ -88,8 +88,8 @@ func TestPiecePlaySilence(t *testing.T) {
 	expected := []block{
 		{start: frac.F(0, 1), duration: frac.F(2, 1), frequencies: []float64{}},
 		{start: frac.F(2, 1), duration: frac.F(1, 1), frequencies: []float64{0}},
-		{start: frac.F(3, 1), duration: frac.F(3, 1), frequencies: []float64{}},
-		{start: frac.F(6, 1), duration: frac.F(1, 1), frequencies: []float64{0}},
+		{start: frac.F(3, 1), duration: frac.F(1, 1), frequencies: []float64{}},
+		{start: frac.F(4, 1), duration: frac.F(3, 1), frequencies: []float64{0}},
 	}
 	if len(blocks) != len(expected) {
 		t.Fatalf("intersection blocks length don't match: \n%v\n%v", blocks, expected)

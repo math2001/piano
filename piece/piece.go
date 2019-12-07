@@ -46,9 +46,9 @@ type Piece struct {
 // a block is like a note but can have multiple streamer (which we mix).
 // the streamers are all mixed from start during duration.
 type block struct {
-	// we don't need to know about start
-	start    frac.Frac
 	duration frac.Frac
+	// we don't need to know about start
+	start frac.Frac
 	// this will be become streamers when I switch to samples instead of
 	// sine waves.
 	frequencies []float64
@@ -116,6 +116,7 @@ func (p *Piece) intersectionBlocks() []block {
 	markers := p.getMarkers()
 
 	var blocks []block
+	fmt.Println(markers)
 
 	for i, currentMarker := range markers {
 		if i == 0 {
@@ -141,9 +142,18 @@ func (p *Piece) intersectionBlocks() []block {
 
 // markers are where the notes start or finish
 func (p *Piece) getMarkers() []frac.Frac {
-	var markers []frac.Frac
-	for _, note := range p.Notes {
-		markers = append(markers, note.Start, note.End())
+
+	markers := make([]frac.Frac, len(p.Notes)*2+1)
+
+	// make sure there is a marker at 0, to allow piece to start with complete
+	// silence... (this is due to the fact that intersectionBlocks just bases
+	// itself on markers exclusively, and hence goes straight to the first marker
+	// all the time)
+	markers[0] = frac.F(0, 1)
+
+	for i, note := range p.Notes {
+		markers[i*2+1] = note.Start
+		markers[i*2+2] = note.End()
 	}
 
 	sort.SliceStable(markers, func(i, j int) bool {
