@@ -1,10 +1,10 @@
 .PHONY: run test
 
-test: *.go wave/*.go
-	go test ./...
-
 run: piano
 	./piano
+
+test: *.go wave/*.go
+	go test ./...
 
 clean:
 	go clean

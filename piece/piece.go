@@ -192,9 +192,12 @@ func (p *Piece) Render() {
 		dens = append(dens, note.Duration.Den(), note.Start.Den())
 	}
 
-	// compute the smallest number which is a product of all the different
-	// primes composing all the denominators
-	sort.Ints(dens)
+	// compute the smallest  product of all the different primes composing all
+	// the denominators
+	sort.Slice(dens, func(i, j int) bool {
+		return dens[i] > dens[j]
+	})
+
 	scaler := 1
 	for _, n := range dens {
 		if scaler%n != 0 {
@@ -207,13 +210,22 @@ func (p *Piece) Render() {
 	type block struct{ start, width int }
 	overlaps := make(map[float64][]block)
 
+	// FIXME: sort frequencies!
 	for freq, notes := range frequencies {
 		fmt.Printf("%3.0f: ", freq)
 		// we assume the notes are sorted
 		cursor := 0
 		for _, note := range notes {
-			start := note.Start.Multiply(k).Num()
-			width := note.Duration.Multiply(k).Num()
+			fstart := note.Start.Multiply(k)
+			fwidth := note.Duration.Multiply(k)
+			if fstart.Den() != 1 {
+				panic("start denominator != 1 (scaling doesn't work)")
+			}
+			if fwidth.Den() != 1 {
+				panic("width denominator != 1 (scaling doesn't work)")
+			}
+			start := fstart.Num()
+			width := fwidth.Num()
 			if cursor > start {
 				overlaps[freq] = append(overlaps[freq], block{start, cursor - start})
 				if cursor > start+width {

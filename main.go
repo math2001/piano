@@ -58,16 +58,18 @@ func main() {
 		},
 	}
 	p = &piece.Piece{
+		// 440: ******
+		// 512:   ***
 		Notes: []piece.Note{
 			piece.Note{
 				Frequency: 440,
-				Duration:  frac.N(2),
+				Duration:  frac.F(3, 2),
 				Start:     frac.N(0),
 			},
 			piece.Note{
-				Frequency: 440,
-				Duration:  frac.N(2),
-				Start:     frac.N(1),
+				Frequency: 512,
+				Duration:  frac.F(3, 4),
+				Start:     frac.F(1, 2),
 			},
 		},
 	}

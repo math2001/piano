@@ -14,20 +14,20 @@ func TestIntersectionSimultaneous(t *testing.T) {
 		Notes: []Note{
 			Note{
 				Frequency: 440,
-				Duration:  frac.N(2),
+				Duration:  frac.F(1, 2),
 				Start:     frac.N(0),
 			},
 			Note{
 				Frequency: 523.25,
-				Duration:  frac.N(2),
+				Duration:  frac.F(1, 2),
 				Start:     frac.N(0),
 			},
 		},
 	}
+	p.Render()
 
 	actual := p.intersectionBlocks()
 	expected := []block{
-		// two streamers, don't really know how it's gonna be implemented
 		{start: frac.N(0), duration: frac.N(2), frequencies: []float64{440, 523.25}},
 	}
 	CompareBlocks(t, actual, expected)
