@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/faiface/beep"
+	"github.com/faiface/beep/effects"
 	"github.com/math2001/piano/frac"
 	"github.com/math2001/piano/wave"
 )
@@ -94,12 +95,21 @@ func (p *Piece) GetStreamer(sr beep.SampleRate, beat time.Duration) beep.Streame
 			for _, freq := range block.frequencies {
 				mixer.Add(beep.Loop(-1, wave.NewSine(wave.N(sr, freq))))
 			}
-			streamer = mixer
+			if mixer.Len() != len(block.frequencies) {
+				panic("wtf")
+			}
+			// mixer only sums up the samples. That means if we sum up to 1s,
+			// we get a two which isn't allowed. Instead, we want to take the
+			// *average* of the different streamers. This is what gain does
+			// here...
+			streamer = &effects.Gain{
+				Streamer: mixer,
+				// this hacky thing is due to how Gain is implemented...
+				Gain: 1.0/float64(mixer.Len()) - 1.0,
+			}
 		}
 		streamers = append(streamers, beep.Take(nsamples, streamer))
 	}
-
-	fmt.Println(streamers)
 
 	return beep.Seq(streamers...)
 }
@@ -142,7 +152,6 @@ func (p *Piece) getMarkers() []frac.Frac {
 	sort.SliceStable(markers, func(i, j int) bool {
 		return markers[i].Float() < markers[j].Float()
 	})
-	fmt.Println(markers)
 
 	// remove duplicates
 	j := 1

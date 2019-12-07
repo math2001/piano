@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/faiface/beep"
+	"github.com/faiface/beep/effects"
 	"github.com/faiface/beep/speaker"
 	"github.com/math2001/piano/frac"
 	"github.com/math2001/piano/labels"
@@ -40,7 +41,17 @@ func main() {
 				Start:     frac.F(3, 1),
 			},
 			piece.Note{
+				Frequency: lb.F("F4"),
+				Duration:  frac.F(3, 1),
+				Start:     frac.F(4, 1),
+			},
+			piece.Note{
 				Frequency: lb.F("A4"),
+				Duration:  frac.F(3, 1),
+				Start:     frac.F(4, 1),
+			},
+			piece.Note{
+				Frequency: lb.F("C5"),
 				Duration:  frac.F(3, 1),
 				Start:     frac.F(4, 1),
 			},
@@ -50,7 +61,11 @@ func main() {
 	sr := beep.SampleRate(44100)
 	speaker.Init(sr, sr.N(time.Second/6))
 
-	streamer := p.GetStreamer(sr, piece.FromBPM(60))
+	// put it in a gain, just so we don't play full throttle
+	streamer := &effects.Gain{
+		Streamer: p.GetStreamer(sr, piece.FromBPM(60)),
+		Gain:     -0.1,
+	}
 
 	done := make(chan bool)
 	speaker.Play(beep.Seq(streamer, beep.Callback(func() {
