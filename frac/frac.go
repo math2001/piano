@@ -1,6 +1,11 @@
 package frac
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
+
+var ErrZeroDivision = errors.New("divide by zero")
 
 // Frac is an immutable number
 type Frac struct {
@@ -8,8 +13,27 @@ type Frac struct {
 	den int
 }
 
+// NewFrac returns a fraction, or an error if the denominator is 0
+func NewFrac(num int, den int) (Frac, error) {
+	if den == 0 {
+		return Frac{}, ErrZeroDivision
+	}
+	return Frac{num, den}.Simplify(), nil
+}
+
+// F returns a new fraction and panics if den is 0!
+// Only use this function with static numbers (no user data!)
 func F(num int, den int) Frac {
-	return Frac{num, den}
+	f, err := NewFrac(num, den)
+	if err != nil {
+		panic(fmt.Sprintf("%s (if you don't want a panic, use NewFrac)", err))
+	}
+	return f
+}
+
+// N returns a new fraction with denominator one.
+func N(num int) Frac {
+	return Frac{num, 1}
 }
 
 func (f Frac) String() string {
@@ -21,7 +45,7 @@ func (f Frac) Float() float64 {
 }
 
 func (f Frac) Simplify() Frac {
-	// what happens with negative numbers?
+	// FIXME: what happens with negative numbers?
 	k := gcd(f.Num(), f.Den())
 	return Frac{f.Num() / k, f.Den() / k}
 }
@@ -61,7 +85,7 @@ func (a Frac) Add(b Frac) Frac {
 }
 
 func (a Frac) Minus(b Frac) Frac {
-	return a.Add(b.Multiply(Frac{-1, 1}))
+	return a.Add(b.Multiply(Frac{-1, 1})).Simplify()
 }
 
 // I just realised that we don't need this function... == works on struct with
