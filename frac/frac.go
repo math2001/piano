@@ -1,6 +1,7 @@
 package frac
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 )
@@ -48,6 +49,20 @@ func (f Frac) Simplify() Frac {
 	// FIXME: what happens with negative numbers?
 	k := gcd(f.Num(), f.Den())
 	return Frac{f.Num() / k, f.Den() / k}
+}
+
+func (f Frac) MarshalJSON() ([]byte, error) {
+	return json.Marshal([2]int{f.num, f.den})
+}
+
+func (f *Frac) UnmarshalJSON(data []byte) error {
+	var numbers []int
+	if err := json.Unmarshal(data, &numbers); err != nil {
+		return err
+	}
+	f.num = numbers[0]
+	f.den = numbers[1]
+	return nil
 }
 
 func (f Frac) Abs() Frac {

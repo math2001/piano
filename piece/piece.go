@@ -16,19 +16,19 @@ import (
 // right now, it's very simplistic
 type Note struct {
 	// Volume == 0 -> remains unchanged. < 0 decrease volume, > 0 increase volume
-	Volume float64
+	Volume float64 `json:"volume"`
 
 	// Frequency is the pitch of the note
-	Frequency float64
+	Frequency float64 `json:"frequency"`
 
 	// Duration is the coefficient of a beat
 	// ie. 1 is the duration one beat
 	//     2 is the duration two beats
 	//     .5 is the duration of half a beat
-	Duration frac.Frac
+	Duration frac.Frac `json:"duration"`
 
 	// Start is the starting time, as a scaling of the beat
-	Start frac.Frac
+	Start frac.Frac `json:"start"`
 }
 
 func (n Note) End() frac.Frac {
@@ -37,10 +37,10 @@ func (n Note) End() frac.Frac {
 
 // Piece is a collection of notes
 type Piece struct {
-	name string
+	Name string `json:"name"`
 	// float64 is a scalar describing the start time of each note relative to
 	// the start of the piece (it scales one beat)
-	Notes []Note
+	Notes []Note `json:"notes"`
 }
 
 // a block is like a note but can have multiple streamer (which we mix).
@@ -60,10 +60,13 @@ func (b *block) end() frac.Frac {
 
 func (b *block) equal(target block) bool {
 
-	// do the cheap comparaissons first
 	equal := b.start == target.start
 	equal = equal && b.duration == target.duration
 	equal = equal && len(b.frequencies) == len(target.frequencies)
+	// do the cheap comparaissons first
+	if !equal {
+		return false
+	}
 
 	for i := range b.frequencies {
 		if b.frequencies[i] != target.frequencies[i] {
@@ -71,7 +74,7 @@ func (b *block) equal(target block) bool {
 		}
 	}
 
-	return equal
+	return true
 }
 
 // Play assumes that the speaker has been initialized
@@ -257,6 +260,19 @@ func (p *Piece) Render() {
 		}
 		fmt.Println()
 	}
+}
+
+func (a *Piece) Equal(b *Piece) bool {
+	if a.Name != b.Name || len(a.Notes) != len(b.Notes) {
+		return false
+	}
+
+	for i := range a.Notes {
+		if a.Notes[i] != b.Notes[i] {
+			return false
+		}
+	}
+	return true
 }
 
 // FromBPM returns the duration of the one beat for a given bpm (beat per minute)

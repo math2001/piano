@@ -2,6 +2,8 @@ package main
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -55,7 +57,18 @@ func main() {
 			},
 		},
 	}
-	p.Render()
+	var buf bytes.Buffer
+	encoder := json.NewEncoder(&buf)
+	if err := encoder.Encode(p); err != nil {
+		log.Fatal(err)
+	}
+	decoder := json.NewDecoder(&buf)
+	target := &piece.Piece{}
+	if err := decoder.Decode(target); err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("done")
+	return
 
 	sr := beep.SampleRate(44100)
 	speaker.Init(sr, sr.N(time.Second/6))

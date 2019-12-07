@@ -1,6 +1,7 @@
 package piece
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 
@@ -238,4 +239,58 @@ func CompareBlocks(t *testing.T, actual, expected []block) {
 			t.Errorf("intersection block #%d doesn't match: \n%v\n%v", i, block, expected[i])
 		}
 	}
+}
+
+func TestSerialize(t *testing.T) {
+	p := &Piece{
+		Notes: []Note{
+			// 2:  **
+			// 1 : *  * ****
+			// 3:     *****
+			Note{
+				Frequency: 1,
+				Duration:  frac.F(1, 2),
+				Start:     frac.F(0, 2),
+			},
+			Note{
+				Frequency: 2,
+				Duration:  frac.F(2, 2),
+				Start:     frac.F(1, 2),
+			},
+			Note{
+				Frequency: 1,
+				Duration:  frac.F(1, 2),
+				Start:     frac.F(3, 2),
+			},
+			Note{
+				Frequency: 3,
+				Duration:  frac.F(1, 2),
+				Start:     frac.F(4, 2),
+			},
+			Note{
+				Frequency: 3,
+				Duration:  frac.F(4, 2),
+				Start:     frac.F(5, 2),
+			},
+			Note{
+				Frequency: 1,
+				Duration:  frac.F(4, 2),
+				Start:     frac.F(5, 2),
+			},
+		},
+	}
+
+	buf, err := json.Marshal(p)
+	if err != nil {
+		t.Fatalf("marshaling piece: %s", err)
+	}
+	actual := &Piece{}
+	if err := json.Unmarshal(buf, actual); err != nil {
+		t.Fatalf("unmarshaling json: %s", err)
+	}
+
+	if !actual.Equal(p) {
+		t.Fatalf("marshaling and then unmarshaling yields different result: \n%v\n%v", actual, p)
+	}
+
 }
