@@ -23,19 +23,12 @@ func TestIntersectionSimultaneous(t *testing.T) {
 		},
 	}
 
-	blocks := p.intersectionBlocks()
+	actual := p.intersectionBlocks()
 	expected := []block{
 		// two streamers, don't really know how it's gonna be implemented
 		{start: frac.N(0), duration: frac.N(2), frequencies: []float64{0, 0}},
 	}
-	if len(blocks) != len(expected) {
-		t.Fatalf("intersection blocks length don't match: \n%v\n%v", blocks, expected)
-	}
-	for i, block := range blocks {
-		if !block.equal(expected[i]) {
-			t.Fatalf("intersection block %d doesn't match: \n%v\n%v", i, block, expected[i])
-		}
-	}
+	CompareBlocks(t, actual, expected)
 }
 
 func TestIntersectionContainingOverlap(t *testing.T) {
@@ -53,20 +46,13 @@ func TestIntersectionContainingOverlap(t *testing.T) {
 			},
 		},
 	}
-	blocks := p.intersectionBlocks()
+	actual := p.intersectionBlocks()
 	expected := []block{
 		{start: frac.N(0), duration: frac.N(1), frequencies: []float64{0}},
 		{start: frac.N(1), duration: frac.N(1), frequencies: []float64{0, 0}},
 		{start: frac.N(2), duration: frac.N(1), frequencies: []float64{0}},
 	}
-	if len(blocks) != len(expected) {
-		t.Fatalf("intersection blocks length don't match: \n%v\n%v", blocks, expected)
-	}
-	for i, block := range blocks {
-		if !block.equal(expected[i]) {
-			t.Fatalf("intersection block %d doesn't match: \n%v\n%v", i, block, expected[i])
-		}
-	}
+	CompareBlocks(t, actual, expected)
 }
 
 func TestIntersectionSilence(t *testing.T) {
@@ -115,20 +101,13 @@ func TestIntersectionOverlap(t *testing.T) {
 			},
 		},
 	}
-	blocks := p.intersectionBlocks()
+	actual := p.intersectionBlocks()
 	expected := []block{
 		{start: frac.N(0), duration: frac.N(1), frequencies: []float64{0}},
 		{start: frac.N(1), duration: frac.N(2), frequencies: []float64{0, 0}},
 		{start: frac.N(3), duration: frac.N(1), frequencies: []float64{0}},
 	}
-	if len(blocks) != len(expected) {
-		t.Fatalf("intersection blocks length don't match: \n%v\n%v", blocks, expected)
-	}
-	for i, block := range blocks {
-		if !block.equal(expected[i]) {
-			t.Fatalf("intersection block %d doesn't match: \n%v\n%v", i, block, expected[i])
-		}
-	}
+	CompareBlocks(t, actual, expected)
 }
 
 func TestGetMarkersSimple(t *testing.T) {
@@ -210,6 +189,18 @@ func TestFromBPM(t *testing.T) {
 		actual := FromBPM(row.bpm)
 		if actual != row.duration {
 			t.Errorf("bpm: %d, actual: %v, expected: %v", row.bpm, actual, row.duration)
+		}
+	}
+}
+
+func CompareBlocks(t *testing.T, actual, expected []block) {
+	t.Helper()
+	if len(actual) != len(expected) {
+		t.Fatalf("intersection blocks length don't match: \n(%3d) %v\n(%3d) %v", len(actual), actual, len(expected), expected)
+	}
+	for i, block := range actual {
+		if !block.equal(expected[i]) {
+			t.Fatalf("intersection block #%d doesn't match: \n%v\n%v", i, block, expected[i])
 		}
 	}
 }

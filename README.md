@@ -2,6 +2,11 @@
 
 Something which will eventually be able to play some music of its own.
 
+## Convention
+
+In tests, always print the actual result and then the expected one. I just
+couldn't chose, so I went with alphabetical order.
+
 ## TODO
 
 ### Use `beep.Buffer` when generating waves
@@ -14,3 +19,5 @@ lot of room, as said in the wiki. I should probably use a `beep.Buffer` using a
 
 (Measure the performance gain before doing that)
 Then, I could vary the precision and optimise it for the period of the wave
+
+
