@@ -9,8 +9,8 @@ import (
 
 func TestIntersectionSimultaneous(t *testing.T) {
 	p := &Piece{
-		// 440: **
-		// 523: **
+		// 440: *
+		// 523: *
 		Notes: []Note{
 			Note{
 				Frequency: 440,
@@ -24,23 +24,23 @@ func TestIntersectionSimultaneous(t *testing.T) {
 			},
 		},
 	}
-	p.Render()
 
 	actual := p.intersectionBlocks()
 	expected := []block{
-		{start: frac.N(0), duration: frac.N(2), frequencies: []float64{440, 523.25}},
+		{start: frac.N(0), duration: frac.F(1, 2), frequencies: []float64{440, 523.25}},
 	}
 	CompareBlocks(t, actual, expected)
 }
 
 func TestIntersectionContainingOverlap(t *testing.T) {
 	p := &Piece{
-		// 440: ***
-		// 523:  *
+		//  * : 1/2 beat
+		// 440: *****
+		// 523:   **
 		Notes: []Note{
 			Note{
 				Frequency: 440,
-				Duration:  frac.N(3),
+				Duration:  frac.F(5, 2),
 				Start:     frac.N(0),
 			},
 			Note{
@@ -54,77 +54,86 @@ func TestIntersectionContainingOverlap(t *testing.T) {
 	expected := []block{
 		{start: frac.N(0), duration: frac.N(1), frequencies: []float64{440}},
 		{start: frac.N(1), duration: frac.N(1), frequencies: []float64{440, 523.25}},
-		{start: frac.N(2), duration: frac.N(1), frequencies: []float64{440}},
+		{start: frac.N(2), duration: frac.F(1, 2), frequencies: []float64{440}},
 	}
 	CompareBlocks(t, actual, expected)
 }
 
 func TestIntersectionSilence(t *testing.T) {
 	p := &Piece{
+		//  * : 1/3 beat
 		// 440:   *
-		// 523:     ***
+		// 523:     *****
 		Notes: []Note{
 			Note{
 				Frequency: 440,
-				Duration:  frac.N(1),
-				Start:     frac.N(2),
+				Duration:  frac.F(1, 3),
+				Start:     frac.F(2, 3),
 			},
 			Note{
 				Frequency: 523.25,
-				Duration:  frac.N(3),
-				Start:     frac.N(4),
+				Duration:  frac.F(5, 3),
+				Start:     frac.F(4, 3),
 			},
 		},
 	}
 	actual := p.intersectionBlocks()
 	expected := []block{
-		{start: frac.N(0), duration: frac.N(2), frequencies: []float64{}},
-		{start: frac.N(2), duration: frac.N(1), frequencies: []float64{440}},
-		{start: frac.N(3), duration: frac.N(1), frequencies: []float64{}},
-		{start: frac.N(4), duration: frac.N(3), frequencies: []float64{523.25}},
+		{start: frac.N(0), duration: frac.F(2, 3), frequencies: []float64{}},
+		{start: frac.F(2, 3), duration: frac.F(1, 3), frequencies: []float64{440}},
+		{start: frac.F(3, 3), duration: frac.F(1, 3), frequencies: []float64{}},
+		{start: frac.F(4, 3), duration: frac.F(5, 3), frequencies: []float64{523.25}},
 	}
 	CompareBlocks(t, actual, expected)
 }
 func TestIntersectionOverlap(t *testing.T) {
 	p := &Piece{
-		// 440: ***
-		// 523:  ***
+		//  * : 1/6 beat
+		// 440: *******
+		// 523:     *****
 		Notes: []Note{
 			Note{
 				Frequency: 440,
-				Duration:  frac.N(3),
+				Duration:  frac.F(7, 6),
 				Start:     frac.N(0),
 			},
 			Note{
 				Frequency: 523.25,
-				Duration:  frac.N(3),
-				Start:     frac.N(1),
+				Duration:  frac.F(5, 6),
+				Start:     frac.F(4, 6),
 			},
 		},
 	}
 	actual := p.intersectionBlocks()
 	expected := []block{
-		{start: frac.N(0), duration: frac.N(1), frequencies: []float64{440}},
-		{start: frac.N(1), duration: frac.N(2), frequencies: []float64{440, 523.25}},
-		{start: frac.N(3), duration: frac.N(1), frequencies: []float64{523.25}},
+		{start: frac.N(0), duration: frac.F(4, 6), frequencies: []float64{440}},
+		{start: frac.F(4, 6), duration: frac.F(3, 6), frequencies: []float64{440, 523.25}},
+		{start: frac.F(7, 6), duration: frac.F(2, 6), frequencies: []float64{523.25}},
 	}
 	CompareBlocks(t, actual, expected)
 }
 
 func TestGetMarkersSimple(t *testing.T) {
 	p := &Piece{
-		// 440: ***
+		//  * : 1 / 2 beat
+		// 440: ******
 		// 523:  ***
+		// 722:   *****
 		Notes: []Note{
 			Note{
 				Frequency: 440,
-				Duration:  frac.N(3),
+				Duration:  frac.F(6, 2),
 				Start:     frac.N(0),
 			},
 			Note{
 				Frequency: 523.25,
-				Duration:  frac.N(3),
-				Start:     frac.N(1),
+				Duration:  frac.F(3, 2),
+				Start:     frac.F(1, 2),
+			},
+			Note{
+				Frequency: 722,
+				Duration:  frac.F(5, 2),
+				Start:     frac.F(2, 2),
 			},
 		},
 	}
@@ -132,9 +141,11 @@ func TestGetMarkersSimple(t *testing.T) {
 	actual := p.getMarkers()
 	expected := []frac.Frac{
 		frac.N(0),
-		frac.N(1),
-		frac.N(3),
-		frac.N(4),
+		frac.F(1, 2),
+		frac.F(2, 2),
+		frac.F(4, 2),
+		frac.F(6, 2),
+		frac.F(7, 2),
 	}
 
 	if len(actual) != len(expected) {
@@ -150,23 +161,31 @@ func TestGetMarkersSimple(t *testing.T) {
 func TestGetMarkersDuplicates(t *testing.T) {
 	p := &Piece{
 		Notes: []Note{
+			//  * : 1/3 beat
+			// 200:    *
 			// 349:   ***
-			// 440: ***
+			// 440:  **
 			// 523:  ***
+			// notice how we don't start at 0
 			Note{
-				Frequency: 440,
-				Duration:  frac.N(3),
-				Start:     frac.N(0),
-			},
-			Note{
-				Frequency: 523.25,
-				Duration:  frac.N(3),
-				Start:     frac.N(1),
+				Frequency: 200,
+				Duration:  frac.F(1, 3),
+				Start:     frac.F(3, 3),
 			},
 			Note{
 				Frequency: 349.23,
-				Duration:  frac.N(3),
-				Start:     frac.N(2),
+				Duration:  frac.F(3, 3),
+				Start:     frac.F(2, 3),
+			},
+			Note{
+				Frequency: 440,
+				Duration:  frac.F(2, 3),
+				Start:     frac.F(1, 3),
+			},
+			Note{
+				Frequency: 523.25,
+				Duration:  frac.F(3, 3),
+				Start:     frac.F(1, 3),
 			},
 		},
 	}
@@ -174,11 +193,11 @@ func TestGetMarkersDuplicates(t *testing.T) {
 	actual := p.getMarkers()
 	expected := []frac.Frac{
 		frac.N(0),
-		frac.N(1),
-		frac.N(2),
-		frac.N(3),
-		frac.N(4),
-		frac.N(5),
+		frac.F(1, 3),
+		frac.F(2, 3),
+		frac.F(3, 3),
+		frac.F(4, 3),
+		frac.F(5, 3),
 	}
 
 	if len(actual) != len(expected) {
@@ -216,7 +235,7 @@ func CompareBlocks(t *testing.T, actual, expected []block) {
 	}
 	for i, block := range actual {
 		if !block.equal(expected[i]) {
-			t.Fatalf("intersection block #%d doesn't match: \n%v\n%v", i, block, expected[i])
+			t.Errorf("intersection block #%d doesn't match: \n%v\n%v", i, block, expected[i])
 		}
 	}
 }

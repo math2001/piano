@@ -58,8 +58,8 @@ func main() {
 		},
 	}
 	p = &piece.Piece{
-		// 440: ******
-		// 512:   ***
+		// 440: *
+		// 512: *
 		Notes: []piece.Note{
 			piece.Note{
 				Frequency: 440,

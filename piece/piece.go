@@ -205,7 +205,12 @@ func (p *Piece) Render() {
 		}
 	}
 
-	k := frac.F(scaler, 1)
+	k := frac.N(scaler)
+
+	// FIXME: use unicode symbols for beat!!!
+	if k.Num() != 1 {
+		fmt.Printf(" * : 1/%d beat\n", k.Num())
+	}
 
 	type block struct{ start, width int }
 	overlaps := make(map[float64][]block)
