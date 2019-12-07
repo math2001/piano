@@ -59,8 +59,19 @@ func (b *block) end() frac.Frac {
 }
 
 func (b *block) equal(target block) bool {
-	// FIXME: better comparaisson of streamers please
-	return b.start.Equal(target.start) && b.duration.Equal(target.duration) && len(b.frequencies) == len(target.frequencies)
+
+	// do the cheap comparaissons first
+	equal := b.start == target.start
+	equal = equal && b.duration == target.duration
+	equal = equal && len(b.frequencies) == len(target.frequencies)
+
+	for i := range b.frequencies {
+		if b.frequencies[i] != target.frequencies[i] {
+			return false
+		}
+	}
+
+	return equal
 }
 
 // Play assumes that the speaker has been initialized
