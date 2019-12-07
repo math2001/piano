@@ -92,7 +92,7 @@ func (p *Piece) GetStreamer(sr beep.SampleRate, beat time.Duration) beep.Streame
 
 	var streamers []beep.Streamer
 	for _, block := range blocks {
-		nsamples := sr.N(beat * time.Duration(block.duration.Float()))
+		nsamples := sr.N(time.Duration(float64(beat) * block.duration.Float()))
 
 		var streamer beep.Streamer
 		if len(block.frequencies) == 0 {

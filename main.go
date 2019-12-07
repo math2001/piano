@@ -20,61 +20,42 @@ func main() {
 	lb := labels.NewLabels()
 	p := &piece.Piece{
 		Notes: []piece.Note{
+			// C5:  **
+			// A4: *  * ****
+			// F4:     *****
 			piece.Note{
 				Frequency: lb.F("A4"),
-				Duration:  frac.F(1, 1),
-				Start:     frac.F(0, 1),
+				Duration:  frac.F(1, 2),
+				Start:     frac.F(0, 2),
 			},
 			piece.Note{
 				Frequency: lb.F("C5"),
-				Duration:  frac.F(1, 1),
-				Start:     frac.F(1, 1),
-			},
-			piece.Note{
-				Frequency: lb.F("A4"),
-				Duration:  frac.F(1, 1),
-				Start:     frac.F(2, 1),
-			},
-			piece.Note{
-				Frequency: lb.F("F4"),
-				Duration:  frac.F(1, 1),
-				Start:     frac.F(3, 1),
-			},
-			piece.Note{
-				Frequency: lb.F("F4"),
-				Duration:  frac.F(3, 1),
-				Start:     frac.F(4, 1),
-			},
-			piece.Note{
-				Frequency: lb.F("A4"),
-				Duration:  frac.F(3, 1),
-				Start:     frac.F(4, 1),
-			},
-			piece.Note{
-				Frequency: lb.F("C5"),
-				Duration:  frac.F(3, 1),
-				Start:     frac.F(4, 1),
-			},
-		},
-	}
-	p = &piece.Piece{
-		// 440: *
-		// 512: *
-		Notes: []piece.Note{
-			piece.Note{
-				Frequency: 440,
-				Duration:  frac.F(3, 2),
-				Start:     frac.N(0),
-			},
-			piece.Note{
-				Frequency: 512,
-				Duration:  frac.F(3, 4),
+				Duration:  frac.F(2, 2),
 				Start:     frac.F(1, 2),
+			},
+			piece.Note{
+				Frequency: lb.F("A4"),
+				Duration:  frac.F(1, 2),
+				Start:     frac.F(3, 2),
+			},
+			piece.Note{
+				Frequency: lb.F("F4"),
+				Duration:  frac.F(1, 2),
+				Start:     frac.F(4, 2),
+			},
+			piece.Note{
+				Frequency: lb.F("F4"),
+				Duration:  frac.F(4, 2),
+				Start:     frac.F(5, 2),
+			},
+			piece.Note{
+				Frequency: lb.F("A4"),
+				Duration:  frac.F(4, 2),
+				Start:     frac.F(5, 2),
 			},
 		},
 	}
 	p.Render()
-	return
 
 	sr := beep.SampleRate(44100)
 	speaker.Init(sr, sr.N(time.Second/6))
