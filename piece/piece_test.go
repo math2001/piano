@@ -72,21 +72,14 @@ func TestIntersectionSilence(t *testing.T) {
 			},
 		},
 	}
-	blocks := p.intersectionBlocks()
+	actual := p.intersectionBlocks()
 	expected := []block{
 		{start: frac.N(0), duration: frac.N(2), frequencies: []float64{}},
 		{start: frac.N(2), duration: frac.N(1), frequencies: []float64{440}},
 		{start: frac.N(3), duration: frac.N(1), frequencies: []float64{}},
 		{start: frac.N(4), duration: frac.N(3), frequencies: []float64{523.25}},
 	}
-	if len(blocks) != len(expected) {
-		t.Fatalf("intersection blocks length don't match: \n%v\n%v", blocks, expected)
-	}
-	for i, block := range blocks {
-		if !block.equal(expected[i]) {
-			t.Fatalf("intersection block %d doesn't match: \n%v\n%v", i, block, expected[i])
-		}
-	}
+	CompareBlocks(t, actual, expected)
 }
 func TestIntersectionOverlap(t *testing.T) {
 	p := &Piece{
@@ -141,6 +134,11 @@ func TestGetMarkersSimple(t *testing.T) {
 	if len(actual) != len(expected) {
 		t.Fatalf("markers length don't match: \n(%d) %v\n(%d) %v", len(actual), actual, len(expected), expected)
 	}
+	for i := range actual {
+		if actual[i] != expected[i] {
+			t.Fatalf("markers #%d doesn't match\n%v\n%v", i, actual, expected)
+		}
+	}
 }
 
 func TestGetMarkersDuplicates(t *testing.T) {
@@ -176,6 +174,11 @@ func TestGetMarkersDuplicates(t *testing.T) {
 
 	if len(actual) != len(expected) {
 		t.Fatalf("markers length don't match: \n(%d) %v\n(%d) %v", len(actual), actual, len(expected), expected)
+	}
+	for i := range actual {
+		if actual[i] != expected[i] {
+			t.Fatalf("markers #%d doesn't match\n%v\n%v", i, actual, expected)
+		}
 	}
 }
 
