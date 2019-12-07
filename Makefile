@@ -6,6 +6,10 @@ test: *.go wave/*.go
 run: piano
 	./piano
 
+clean:
+	go clean
+	go clean -testcache
+
 piano: $(shell fd --type f --extension go)
 	go build
 
