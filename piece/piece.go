@@ -116,7 +116,6 @@ func (p *Piece) intersectionBlocks() []block {
 	markers := p.getMarkers()
 
 	var blocks []block
-	fmt.Println(markers)
 
 	for i, currentMarker := range markers {
 		if i == 0 {

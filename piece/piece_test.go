@@ -7,7 +7,7 @@ import (
 	"github.com/math2001/piano/frac"
 )
 
-func TestPiecePlaySimultaneous(t *testing.T) {
+func TestIntersectionSimultaneous(t *testing.T) {
 	p := &Piece{
 		Notes: []Note{
 			Note{
@@ -38,7 +38,7 @@ func TestPiecePlaySimultaneous(t *testing.T) {
 	}
 }
 
-func TestPiecePlayContainingOverlap(t *testing.T) {
+func TestIntersectionContainingOverlap(t *testing.T) {
 	p := &Piece{
 		Notes: []Note{
 			Note{
@@ -69,7 +69,7 @@ func TestPiecePlayContainingOverlap(t *testing.T) {
 	}
 }
 
-func TestPiecePlaySilence(t *testing.T) {
+func TestIntersectionSilence(t *testing.T) {
 	p := &Piece{
 		Notes: []Note{
 			Note{
@@ -100,7 +100,7 @@ func TestPiecePlaySilence(t *testing.T) {
 		}
 	}
 }
-func TestPiecePlayIntersectingOverlap(t *testing.T) {
+func TestIntersectionOverlap(t *testing.T) {
 	p := &Piece{
 		Notes: []Note{
 			Note{
